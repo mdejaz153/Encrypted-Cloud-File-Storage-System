@@ -1,9 +1,163 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/encryption.h"
-#include "../include/file_manager.h"
-#include "../include/cloud_operations.h"
+#include "./include/encryption.h"
+#include "./include/file_manager.h"
+#include "./include/cloud_operations.h"
+
+// ================== GLOBAL USER STATE ==================
+static char current_username[50] = "";
+static unsigned int current_password_hash = 0;
+
+// ===== Internal helper functions (only is file ke andar use) =====
+static void create_account();
+static int login_existing_user();
+static int verify_user_password_for_delete();
+
+// ================== LOGIN / SIGNUP PAGE ==================
+void login_page() {
+    int choice;
+
+    // Users folder create (agar already hai to kuch nahi hoga)
+    system("mkdir -p users");
+
+    printf("\n============================================\n");
+    printf("           USER LOGIN / SIGNUP\n");
+    printf("============================================\n");
+
+    while (1) {
+        printf("\n1. Login\n");
+        printf("2. Create New Account\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                if (login_existing_user()) {
+                    printf("\nLogin successful! Welcome, %s\n", current_username);
+                    return;  // login ho gaya, ab main menu chalega
+                }
+                break;
+
+            case 2:
+                create_account();
+                break;
+
+            case 3:
+                printf("\nExiting program.\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+}
+
+// ================== ACCOUNT CREATION ==================
+static void create_account() {
+    char username[50], password[50];
+    char path[100];
+    FILE *f;
+
+    printf("\n=== CREATE NEW ACCOUNT ===\n");
+    printf("Enter new username: ");
+    scanf("%s", username);
+
+    // Har user ka alag file: users/<username>.txt
+    sprintf(path, "users/%s.txt", username);
+
+    // Check agar user already exist karta hai
+    f = fopen(path, "r");
+    if (f != NULL) {
+        printf("Error: Username already exists. Try another.\n");
+        fclose(f);
+        return;
+    }
+
+    printf("Enter new password: ");
+    scanf("%s", password);
+
+    unsigned int pass_hash = generate_key_hash(password);
+
+    f = fopen(path, "w");
+    if (f == NULL) {
+        printf("Error: Cannot create user file.\n");
+        return;
+    }
+
+    fprintf(f, "%u\n", pass_hash);
+    fclose(f);
+
+    printf("Account created successfully! Please login now.\n");
+}
+
+// ================== LOGIN EXISTING USER ==================
+static int login_existing_user() {
+    char username[50], password[50];
+    char path[100];
+    unsigned int stored_hash;
+    FILE *f;
+
+    printf("\n=== LOGIN ===\n");
+    printf("Enter username: ");
+    scanf("%s", username);
+
+    sprintf(path, "users/%s.txt", username);
+
+    f = fopen(path, "r");
+    if (f == NULL) {
+        printf("Error: User not found. Please create an account first.\n");
+        return 0;
+    }
+
+    if (fscanf(f, "%u", &stored_hash) != 1) {
+        printf("Error: User data corrupted.\n");
+        fclose(f);
+        return 0;
+    }
+    fclose(f);
+
+    printf("Enter password: ");
+    scanf("%s", password);
+
+    unsigned int input_hash = generate_key_hash(password);
+
+    if (input_hash != stored_hash) {
+        printf("Error: Incorrect password. Please try again.\n");
+        return 0;
+    }
+
+    // Save current logged-in user info
+    strcpy(current_username, username);
+    current_password_hash = stored_hash;
+
+    return 1;
+}
+
+// ================== VERIFY PASSWORD BEFORE DELETE ==================
+static int verify_user_password_for_delete() {
+    char password[50];
+
+    if (current_password_hash == 0) {
+        printf("Error: No user logged in.\n");
+        return 0;
+    }
+
+    printf("Enter your account password to confirm delete: ");
+    scanf("%s", password);
+
+    unsigned int input_hash = generate_key_hash(password);
+
+    if (input_hash != current_password_hash) {
+        printf("Error: Incorrect password. File deletion cancelled.\n");
+        return 0;
+    }
+
+    return 1;
+}
+
+// ================== FILE OPERATIONS ==================
 
 // Upload and encrypt file
 void upload_file() {
@@ -53,9 +207,9 @@ void upload_file() {
     sprintf(key_hash_str, "%u", key_hash);
     add_metadata(file_id, filename, 1, key_hash_str);
     
-    printf("\n✓ File uploaded successfully!\n");
+    printf("\n[OK] File uploaded successfully!\n");
     printf("File ID: %s\n", file_id);
-    printf("⚠ IMPORTANT: Save this ID and remember your key!\n");
+    printf("IMPORTANT: Save this ID and remember your key!\n");
 }
 
 // Download and decrypt file with key verification
@@ -132,11 +286,17 @@ void delete_file() {
         printf("Error: File ID not found!\n");
         return;
     }
+
+    // ======= PASSWORD CHECK BEFORE DELETE =======
+    if (!verify_user_password_for_delete()) {
+        // Password galat hai, delete cancel
+        return;
+    }
     
     // Delete encrypted file
     if(remove(encrypted_path) == 0) {
         delete_metadata(file_id);
-        printf("\n✓ File deleted successfully!\n");
+        printf("\n[OK] File deleted successfully!\n");
     } else {
         printf("Error: Cannot delete file!\n");
     }
