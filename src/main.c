@@ -6,21 +6,19 @@ int main() {
 
     int choice;
 
-    printf("\n=== Encrypted Cloud File Storage System ===\n");
-
     while (1) {
 
-        printf("\n1. Upload New File");
-        printf("\n2. Upload New Version");
-        printf("\n3. Decrypt File");
-        printf("\n4. Delete File");
-        printf("\n5. List Files");
-        printf("\n0. Exit");
-        printf("\nEnter choice: ");
+        printf("\n=== Encrypted Cloud Storage ===\n");
+        printf("1. Upload New File\n");
+        printf("2. Upload New Version\n");
+        printf("3. Decrypt File\n");
+        printf("4. Delete File\n");
+        printf("5. List Files\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
         scanf("%d", &choice);
 
         if (choice == 0) {
-            printf("Exiting...\n");
             break;
         }
 
@@ -34,7 +32,7 @@ int main() {
             printf("Enter display name: ");
             scanf("%s", name);
 
-            printf("Enter encryption key: ");
+            printf("Enter key: ");
             scanf("%d", &key);
 
             int id = generate_file_id();
@@ -44,17 +42,17 @@ int main() {
             encrypt_file(in, out, key);
             save_metadata(id, name, v);
 
-            printf("Uploaded → ID: %d  Version: v1\n", id);
+            printf("Upload Success → ID: %d  Version: v1\n", id);
         }
 
         else if (choice == 2) {
             int id, key;
-            char in[200], out[200], name[200]="same";
+            char in[200], out[200], name[200] = "same";
 
-            printf("Enter File ID: ");
+            printf("Enter file ID: ");
             scanf("%d", &id);
 
-            printf("Enter input file path: ");
+            printf("Enter new file path: ");
             scanf("%s", in);
 
             printf("Enter key: ");
@@ -66,17 +64,17 @@ int main() {
             encrypt_file(in, out, key);
             save_metadata(id, name, v);
 
-            printf("New Version Uploaded: v%d\n", v);
+            printf("New Version Uploaded → v%d\n", v);
         }
 
         else if (choice == 3) {
             int id, v, key;
-            char out[200], in[200];
+            char in[200], out[200];
 
-            printf("Enter File ID: ");
+            printf("Enter file ID: ");
             scanf("%d", &id);
 
-            printf("Enter Version: ");
+            printf("Enter version: ");
             scanf("%d", &v);
 
             printf("Enter key: ");
@@ -89,7 +87,7 @@ int main() {
 
             build_filename(id, v, in);
 
-            printf("Enter output file name: ");
+            printf("Save decrypted as: ");
             scanf("%s", out);
 
             decrypt_file(in, out, key);
@@ -98,16 +96,16 @@ int main() {
         else if (choice == 4) {
             int id, v;
 
-            printf("Enter File ID: ");
+            printf("Enter file ID: ");
             scanf("%d", &id);
 
-            printf("Enter Version: ");
+            printf("Enter version: ");
             scanf("%d", &v);
 
             if (delete_file_cloud(id, v))
-                printf("Deleted.\n");
+                printf("File deleted.\n");
             else
-                printf("Could not delete.\n");
+                printf("Delete failed.\n");
         }
 
         else if (choice == 5) {
@@ -115,7 +113,7 @@ int main() {
         }
 
         else {
-            printf("Invalid choice.\n");
+            printf("Invalid option.\n");
         }
     }
 
