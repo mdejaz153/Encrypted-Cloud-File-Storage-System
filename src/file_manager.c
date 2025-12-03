@@ -10,35 +10,48 @@ void generate_file_id(char *file_id) {
     sprintf(file_id, "FILE_%ld", t);
 }
 
-// Add file entry to metadata
-void add_metadata(char *file_id, char *original_name, int version) {
+// Simple hash function for key verification
+unsigned int generate_key_hash(char *key) {
+    unsigned int hash = 5381;
+    int c;
+    
+    while ((c = *key++)) {
+        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+    }
+    
+    return hash;
+}
+
+// Add file entry to metadata with key hash
+void add_metadata(char *file_id, char *original_name, int version, char *key_hash) {
     FILE *meta = fopen("cloud_storage/metadata.txt", "a");
     if(meta == NULL) {
         printf("Error: Cannot create metadata file!\n");
         return;
     }
     
-    fprintf(meta, "%s|%s|v%d\n", file_id, original_name, version);
+    fprintf(meta, "%s|%s|v%d|%s\n", file_id, original_name, version, key_hash);
     fclose(meta);
     printf("Metadata updated successfully!\n");
 }
 
-// Search file ID in metadata
-int search_metadata(char *file_id, char *encrypted_filename) {
+// Search file ID in metadata and return key hash
+int search_metadata(char *file_id, char *encrypted_filename, char *stored_key_hash) {
     FILE *meta = fopen("cloud_storage/metadata.txt", "r");
     if(meta == NULL) {
         return 0;  // File not found
     }
     
     char line[256];
-    char stored_id[100], original_name[100];
+    char stored_id[100], original_name[100], hash[50];
     int version;
     
     while(fgets(line, sizeof(line), meta)) {
-        sscanf(line, "%[^|]|%[^|]|v%d", stored_id, original_name, &version);
+        sscanf(line, "%[^|]|%[^|]|v%d|%s", stored_id, original_name, &version, hash);
         
         if(strcmp(stored_id, file_id) == 0) {
             sprintf(encrypted_filename, "cloud_storage/%s_encrypted.bin", file_id);
+            strcpy(stored_key_hash, hash);
             fclose(meta);
             return 1;  // Found
         }
