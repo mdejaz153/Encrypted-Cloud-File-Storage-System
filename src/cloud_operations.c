@@ -70,7 +70,7 @@ void download_file() {
     
     // Search file in metadata and get stored key hash
     if(!search_metadata(file_id, encrypted_path, stored_key_hash)) {
-        printf("❌ Error: File ID not found!\n");
+        printf(" Error: File ID not found!\n");
         return;
     }
     
@@ -82,7 +82,7 @@ void download_file() {
     sprintf(input_key_hash_str, "%u", input_key_hash);
     
     if(strcmp(stored_key_hash, input_key_hash_str) != 0) {
-        printf("❌ Error: Incorrect decryption key!\n");
+        printf(" Error: Incorrect decryption key!\n");
         printf("Access denied. Please use the correct key.\n");
         return;
     }
@@ -116,7 +116,7 @@ void download_file() {
     
     free(buffer);
     
-    printf("\n✅ File downloaded and decrypted successfully!\n");
+    printf("\n File downloaded and decrypted successfully!\n");
 }
 
 // Delete file from cloud
