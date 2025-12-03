@@ -313,6 +313,13 @@ void delete_file() {
     char file_id[100], encrypted_path[200], dummy_hash[50];
     
     printf("\n--- Delete File ---\n");
+    
+    // Check if user has any files
+    if(!user_has_files()) {
+        printf("No files to delete! Your storage is empty.\n");
+        return;
+    }
+    
     printf("File ID: ");
     scanf("%s", file_id);
     
