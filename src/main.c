@@ -1,17 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "../include/cloud_operations.h"
+
+// Cross-platform directory creation
+void create_directory(const char *path) {
+    #ifdef _WIN32
+        _mkdir(path);
+    #else
+        mkdir(path, 0777);
+    #endif
+}
 
 int main() {
     int choice;
     
     // Create cloud_storage folder if not exists
-    system("mkdir -p cloud_storage");
+    create_directory("cloud_storage");
 
-    // ===== USER LOGIN / SIGNUP =====
+    // User login/signup
     login_page();
     
-    // Simple ASCII banner (no special symbols)
+    // Main menu banner
     printf("\n============================================\n");
     printf("   ENCRYPTED CLOUD FILE STORAGE SYSTEM\n");
     printf("============================================\n");
