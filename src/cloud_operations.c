@@ -1,11 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "../include/encryption.h"
 #include "../include/file_manager.h"
 #include "../include/cloud_operations.h"
+
+#ifdef _WIN32
+    #include <direct.h>  // For _mkdir on Windows
+#else
+    #include <sys/stat.h>
+    #include <sys/types.h>
+#endif
 
 // ================== GLOBAL USER STATE ==================
 static char current_username[50] = "";
