@@ -4,4 +4,4 @@
 void encrypt_file(const char *input_path, const char *output_path, int key);
 void decrypt_file(const char *input_path, const char *output_path, int key);
 
-#endif // ENCRYPTION_H
+#endif
