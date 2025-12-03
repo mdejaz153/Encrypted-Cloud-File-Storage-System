@@ -1,54 +1,21 @@
-#include <stdio.h>
-#include "encryption.h"
+#include "../include/encryption.h"
 
-void encrypt_file(const char *input_path, const char *output_path, int key) {
-
-    FILE *fin = fopen(input_path, "rb");
-    if (!fin) {
-        printf("Cannot open input file.\n");
-        return;
+// XOR Encryption Function
+void xor_encrypt(char *data, int length, char *key) {
+    int key_len = 0;
+    
+    // Calculate key length
+    while(key[key_len] != '\0') {
+        key_len++;
     }
-
-    FILE *fout = fopen(output_path, "wb");
-    if (!fout) {
-        printf("Cannot create encrypted file.\n");
-        fclose(fin);
-        return;
+    
+    // Encrypt each byte with XOR
+    for(int i = 0; i < length; i++) {
+        data[i] = data[i] ^ key[i % key_len];
     }
-
-    int ch;
-    while ((ch = fgetc(fin)) != EOF) {
-        fputc(ch ^ key, fout);
-    }
-
-    fclose(fin);
-    fclose(fout);
-
-    printf("Encrypted & saved as: %s\n", output_path);
 }
 
-void decrypt_file(const char *input_path, const char *output_path, int key) {
-
-    FILE *fin = fopen(input_path, "rb");
-    if (!fin) {
-        printf("Encrypted file not found.\n");
-        return;
-    }
-
-    FILE *fout = fopen(output_path, "wb");
-    if (!fout) {
-        printf("Cannot create output file.\n");
-        fclose(fin);
-        return;
-    }
-
-    int ch;
-    while ((ch = fgetc(fin)) != EOF) {
-        fputc(ch ^ key, fout);
-    }
-
-    fclose(fin);
-    fclose(fout);
-
-    printf("Decrypted & saved as: %s\n", output_path);
+// XOR Decryption Function (same as encryption for XOR)
+void xor_decrypt(char *data, int length, char *key) {
+    xor_encrypt(data, length, key);  // XOR is symmetric
 }
