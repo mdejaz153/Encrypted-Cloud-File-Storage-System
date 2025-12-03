@@ -99,8 +99,7 @@ main.exe        # Windows
 - Minimum 10MB free disk space
 
 ## Author
-University of Petroleum and Energy Studies
-Course: CSEG1032 - Programming in C
+MD EJAZ
 
 ## Limitations
 - XOR encryption is basic (suitable for learning, not production)
