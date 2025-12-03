@@ -7,11 +7,14 @@ int main() {
     
     // Create cloud_storage folder if not exists
     system("mkdir -p cloud_storage");
+
+    // ===== USER LOGIN / SIGNUP =====
+    login_page();
     
-    printf("\n");
-    printf("╔════════════════════════════════════════════╗\n");
-    printf("║   ENCRYPTED CLOUD FILE STORAGE SYSTEM      ║\n");
-    printf("╚════════════════════════════════════════════╝\n");
+    // Simple ASCII banner (no special symbols)
+    printf("\n============================================\n");
+    printf("   ENCRYPTED CLOUD FILE STORAGE SYSTEM\n");
+    printf("============================================\n");
     
     while(1) {
         printf("\n--- MAIN MENU ---\n");
