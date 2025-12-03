@@ -1,6 +1,9 @@
 #ifndef CLOUD_OPERATIONS_H
 #define CLOUD_OPERATIONS_H
 
+// User login / signup screen
+void login_page();
+
 // Function to upload file to cloud storage
 void upload_file();
 
