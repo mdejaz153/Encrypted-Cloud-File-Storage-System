@@ -227,6 +227,22 @@ void upload_file() {
     printf("Remember your ID and key!\n");
 }
 
+// ================== CHECK IF USER HAS FILES ==================
+static int user_has_files() {
+    char meta_path[150], user_folder[100];
+    
+    sprintf(user_folder, "cloud_storage/%s", current_username);
+    sprintf(meta_path, "%s/metadata.txt", user_folder);
+    
+    FILE *meta = fopen(meta_path, "r");
+    if(meta == NULL) {
+        return 0;  // No files
+    }
+    
+    fclose(meta);
+    return 1;  // Has files
+}
+
 // ================== DOWNLOAD FILE ==================
 void download_file() {
     char file_id[100], key[50], encrypted_path[200];
@@ -234,6 +250,13 @@ void download_file() {
     FILE *input, *output;
     
     printf("\n--- Download File ---\n");
+    
+    // Check if user has any files
+    if(!user_has_files()) {
+        printf("No files to download! Please upload a file first.\n");
+        return;
+    }
+    
     printf("File ID: ");
     scanf("%s", file_id);
     
