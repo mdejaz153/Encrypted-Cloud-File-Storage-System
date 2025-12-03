@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "../include/encryption.h"
 #include "../include/file_manager.h"
 #include "../include/cloud_operations.h"
@@ -14,6 +16,16 @@ static void create_account();
 static int login_existing_user();
 static int verify_user_password_for_delete();
 static void get_user_folder_path(char *path);
+static void create_directory(const char *path);
+
+// ================== CREATE DIRECTORY (CROSS-PLATFORM) ==================
+static void create_directory(const char *path) {
+    #ifdef _WIN32
+        _mkdir(path);
+    #else
+        mkdir(path, 0777);
+    #endif
+}
 
 // ================== GET USER FOLDER PATH ==================
 static void get_user_folder_path(char *path) {
@@ -23,8 +35,10 @@ static void get_user_folder_path(char *path) {
 // ================== LOGIN / SIGNUP PAGE ==================
 void login_page() {
     int choice;
-    system("mkdir -p users");
-    system("mkdir -p cloud_storage");
+    
+    // Create necessary directories
+    create_directory("users");
+    create_directory("cloud_storage");
 
     printf("\n============================================\n");
     printf("     ENCRYPTED CLOUD STORAGE SYSTEM\n");
@@ -133,9 +147,7 @@ static int login_existing_user() {
 
     // Create user's personal folder
     sprintf(user_folder, "cloud_storage/%s", username);
-    char cmd[150];
-    sprintf(cmd, "mkdir -p %s", user_folder);
-    system(cmd);
+    create_directory(user_folder);
 
     return 1;
 }
