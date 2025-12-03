@@ -10,7 +10,7 @@ int main() {
     
     printf("\n");
     printf("╔════════════════════════════════════════════╗\n");
-    printf("║   ENCRYPTED CLOUD FILE STORAGE SYSTEM     ║\n");
+    printf("║   ENCRYPTED CLOUD FILE STORAGE SYSTEM      ║\n");
     printf("╚════════════════════════════════════════════╝\n");
     
     while(1) {
