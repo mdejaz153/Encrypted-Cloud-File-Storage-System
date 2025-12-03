@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "../include/cloud_operations.h"
+
+#ifdef _WIN32
+    #include <direct.h>  // For _mkdir on Windows
+#else
+    #include <sys/stat.h>
+    #include <sys/types.h>
+#endif
 
 // Cross-platform directory creation
 void create_directory(const char *path) {
